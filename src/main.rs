@@ -1,21 +1,27 @@
+#[macro_use] extern crate rocket;
+
+use rocket::{State, Shutdown};
+use rocket::response::stream::{EventStream, Event};
+use rocket::tokio::select;
+use rocket::fs::{relative, FileServer};
+use rocket::form::Form;
+use rocket::serde::{Serialize, Deserialize};
+use rocket::tokio::sync::broadcast::{channel, Sender, error::RecvError};
+
 #[launch]
 fn rocket() -> _ {
     rocket::build()
         .manage(channel::<Message>(1024).0)
-        .manage(channel::<Message>(1024).0)
         .mount("/", routes![post, events])
-        .mount("/", FileServer::from(relative!("static")))// a handler that'll serve static files
-}use std::net::Shutdown;
-
+        .mount("/", FileServer::from(relative!("front-end")))// a handler that'll serve static files
+}
 // manage method allows adding state to the rocket server instance, which all handlers have access to. In this case, we are adding a channel that can be used to send messages between different parts of the application. The channel has a buffer size of 1024, which means it can hold up to 1024 messages before blocking.
 // rocket uses Tokyo as async runtime. the return val of calling the channel function is a tuple containing a Sender and a Receiver. to store the sender: use .0 to get the first element of the tuple.
 // rocket provides supposrt for returning html, css, javascrpt
-use rocket::tokio::sync::broadcast::{channel, Sender, error::RecvError};
 
 #[derive(Debug, Clone, FromForm, Serialize, Deserialize)]
 #[cfg_attr(test, derive(PartialEq, UriDisplayQuery))]
 #[serde(crate = "rocket::serde")]
-
 struct Message {
     #[field(validate = len(1..=20))]
     pub room: String,
@@ -31,8 +37,6 @@ struct Message {
 fn post(form: Form<Message>, queue: &State<Sender<Message>>) {
     let _res = queue.send(form.into_inner());// send msg to all receivers
 }
-
-use rocket::form::Form;
 
 // receive (get) msgs; handle "get" requests to the events path
 // the return type is an infinite stream of server-sent events "EventStream" that can be consumed by clients. The stream is created using the broadcast channel's subscribe method, which returns a Receiver<Message> that can be used to receive messages sent through the channel. The stream is then mapped to convert each Message into a Server-Sent Event (SSE) using the Event::data method, which takes a string as input. The resulting stream is returned as an EventStream, which can be consumed by clients using JavaScript's EventSource API.
@@ -58,7 +62,3 @@ async fn events(queue: &State<Sender<Message>>, mut end: Shutdown) -> EventStrea
         }
     }
 }
-
-use rocket::{State, Shutdown};
-use rocket::response::stream::{EventStream, Event};
-use rocket::tokio::select;
