@@ -1,4 +1,4 @@
-#[macro_use] extern crate rocket;
+/* #[macro_use] extern crate rocket;
 
 use rocket::{State, Shutdown};
 use rocket::response::stream::{EventStream, Event};
@@ -62,3 +62,4 @@ async fn events(queue: &State<Sender<Message>>, mut end: Shutdown) -> EventStrea
         }
     }
 }
+*/

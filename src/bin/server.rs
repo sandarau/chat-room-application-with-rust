@@ -28,7 +28,7 @@ enum MessageType {
 
 
 #[tokio::main]
-    /// macro that convert fn main 4rm sync to async using tokio
+    /// macro that convert fnS main 4rm sync to async using tokio
     /// creates a tokio runtime and runs the async main function inside it
 
 async fn main () -> Result<(), Box<dyn Error>> {
@@ -125,5 +125,8 @@ async fn main () -> Result<(), Box<dyn Error>> {
 
     // log the disconnection
     println!("[{}] {} is disconnected", Local::now().format("%H:%M:%S"), username);
+    // needs the [{}] to format the timestamp correctly in the log message
+    // otherwise, the timestamp would be printed as a string literal instead of being evaluated and formatted.
+    // unecessary errors
         Ok(())
 }

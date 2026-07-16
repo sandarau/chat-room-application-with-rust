@@ -1,4 +1,4 @@
-let roomListDiv = document.getElementById('room-list');
+/* let roomListDiv = document.getElementById('room-list');
 let messagesDiv = document.getElementById('messages');
 let newMessageForm = document.getElementById('new-message');
 let newRoomForm = document.getElementById('new-room');
@@ -170,3 +170,4 @@ function init() {
 }
 
 init();
+*/
